@@ -171,7 +171,7 @@ window.iniciarSesion = async function() {
     
     try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "/mi-pulsera/panel.html";
+        window.location.href = "/mi-pulsera/Panel.html";
     } catch (error) {
         console.error("Error:", error);
         mensaje.innerHTML = "❌ Error: " + error.message;
@@ -192,7 +192,7 @@ window.cerrarSesion = function() {
 // FUNCIONES PARA PANEL (panel.html)
 // ============================================
 
-if (window.location.pathname.includes("panel.html")) {
+if (window.location.pathname.includes("Panel.html")) {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("✅ Usuario autenticado:", user.uid);
@@ -363,3 +363,4 @@ async function cargarDatosConsulta(id) {
     }
 
 }
+
