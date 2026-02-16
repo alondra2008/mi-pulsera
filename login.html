@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kizuna - Acceso Padres</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            🔐 Kizuna
+            <span>Padres</span>
+        </h1>
+        
+        <!-- FORMULARIO DE LOGIN -->
+        <div id="loginForm">
+            <h2>Iniciar sesión</h2>
+            
+            <div class="input-group">
+                <input type="email" id="email" placeholder="Correo electrónico" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="password" placeholder="Contraseña" required>
+            </div>
+            
+            <button class="btn btn-primario" onclick="iniciarSesion()">
+                🚀 Entrar
+            </button>
+            
+            <p style="text-align: center; margin-top: 20px;">
+                ¿No tienes cuenta? 
+                <a href="#" onclick="mostrarRegistro()">Regístrate aquí</a>
+            </p>
+        </div>
+
+        <!-- FORMULARIO DE REGISTRO -->
+        <div id="registroForm" class="oculto">
+            <h2>Crear cuenta</h2>
+            
+            <div class="input-group">
+                <input type="email" id="regEmail" placeholder="Correo electrónico" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="password" id="regPassword" placeholder="Contraseña" required>
+            </div>
+            
+            <button class="btn btn-primario" onclick="registrarse()">
+                ✅ Crear cuenta
+            </button>
+            
+            <p style="text-align: center; margin-top: 20px;">
+                <a href="#" onclick="mostrarLogin()">← Volver al login</a>
+            </p>
+        </div>
+
+        <div id="mensaje" class="alerta" style="display: none;"></div>
+        
+        <hr>
+        
+        <div class="footer">
+            <p><a href="index.html">← Volver a la página principal</a></p>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

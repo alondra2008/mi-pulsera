@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kizuna - Pulsera Infantil</title>
+   <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            👶 Kizuna
+            <span>Seguridad</span>
+        </h1>
+        
+        <!-- PASO 1: Ingresar código -->
+        <div id="paso1">
+            <h2>Paso 1: Ingresa el código de tu pulsera</h2>
+            <p style="color: var(--gris-texto); margin-bottom: 20px;">El código está escrito debajo del QR (ej: P001, P002...)</p>
+            
+            <div class="input-group">
+                <input type="text" id="codigoPulsera" placeholder="Ej: P001" required>
+            </div>
+            
+            <button class="btn btn-primario" onclick="buscarPulsera()">
+                🔍 Continuar
+            </button>
+        </div>
+
+        <!-- PASO 2: Formulario de registro -->
+        <div id="paso2" class="oculto">
+            <h2>📝 Registrar niño para pulsera <span id="codigoMostrar"></span></h2>
+            
+            <div class="input-group">
+                <input type="text" id="nombre" placeholder="Nombre del menor" required>
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="alergia" placeholder="Alergias (opcional)">
+            </div>
+            
+            <div class="input-group">
+                <input type="text" id="contacto" placeholder="Teléfono de emergencia" required>
+            </div>
+            
+            <button class="btn btn-primario" onclick="registrar()">✅ Registrar</button>
+            <button class="btn btn-secundario" onclick="volver()">← Volver</button>
+        </div>
+
+        <!-- Mensajes de alerta -->
+        <div id="mensaje" class="alerta" style="display: none;"></div>
+        
+        <hr>
+        
+        <div class="footer">
+            <p>¿Eres padre? <a href="login.html">Accede a tu panel aquí</a></p>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

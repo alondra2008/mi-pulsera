@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kizuna - Historial</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>
+            📍 Kizuna
+            <span>Historial</span>
+        </h1>
+        
+        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+            <button class="btn btn-secundario" onclick="window.location.href='panel.html'" style="width: auto;">
+                ← Volver
+            </button>
+            <button class="btn btn-secundario" onclick="cerrarSesion()" style="width: auto;">
+                Cerrar sesión
+            </button>
+        </div>
+
+        <!-- FILTROS -->
+        <div class="filtros">
+            <input type="date" id="fechaFiltro">
+            <button class="btn btn-primario" onclick="cargarHistorialPorFecha()" style="margin: 0;">Buscar</button>
+            <button class="btn btn-secundario" onclick="cargarHistorialReciente()" style="margin: 0;">Últimas 10</button>
+        </div>
+
+        <!-- LISTA DE HISTORIAL -->
+        <div id="historial" class="lista-historial">
+            <p style="text-align: center; color: var(--gris-texto);">Selecciona una fecha para ver el historial</p>
+        </div>
+
+        <!-- MAPA -->
+        <div id="mapaContainer" class="mapa-container" style="display: none;">
+            <div id="mapa"></div>
+        </div>
+
+        <div id="mensaje" class="alerta" style="display: none;"></div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>
