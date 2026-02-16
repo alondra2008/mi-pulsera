@@ -171,7 +171,7 @@ window.iniciarSesion = async function() {
     
     try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "panel.html";
+        window.location.href = "/mi-pulsera/panel.html";
     } catch (error) {
         console.error("Error:", error);
         mensaje.innerHTML = "❌ Error: " + error.message;
@@ -361,4 +361,5 @@ async function cargarDatosConsulta(id) {
         console.error("Error:", error);
         infoDiv.innerHTML = `<div class="alerta alerta-peligro">Error al cargar datos</div>`;
     }
+
 }
