@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyAXTBEpWnI-Hjw47yUmF-XVeq1r93-u3Rg",
+  apiKey: "AIzaSyBGfmmdSDsYrpgYz5nt2ebvfbHiXRTKXzU",  
   authDomain: "pulsera-b82ce.firebaseapp.com",
   projectId: "pulsera-b82ce",
   storageBucket: "pulsera-b82ce.firebasestorage.app",
@@ -171,7 +171,7 @@ window.iniciarSesion = async function() {
     
     try {
         await signInWithEmailAndPassword(auth, email, password);
-        window.location.href = "/mi-pulsera/Panel.html";
+        window.location.href = "panel.html";
     } catch (error) {
         console.error("Error:", error);
         mensaje.innerHTML = "❌ Error: " + error.message;
@@ -192,7 +192,7 @@ window.cerrarSesion = function() {
 // FUNCIONES PARA PANEL (panel.html)
 // ============================================
 
-if (window.location.pathname.includes("Panel.html")) {
+if (window.location.pathname.includes("panel.html")) {
     onAuthStateChanged(auth, (user) => {
         if (user) {
             console.log("✅ Usuario autenticado:", user.uid);
@@ -361,6 +361,4 @@ async function cargarDatosConsulta(id) {
         console.error("Error:", error);
         infoDiv.innerHTML = `<div class="alerta alerta-peligro">Error al cargar datos</div>`;
     }
-
 }
-
