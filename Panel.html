@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Kizuna - Mi Panel</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .header-panel {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        
+        .btn-cerrar {
+            background: transparent;
+            color: var(--azul-medio);
+            border: 2px solid var(--azul-claro);
+            padding: 8px 16px;
+            border-radius: var(--borde-pequeno);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            width: auto;
+        }
+        
+        .btn-cerrar:hover {
+            background: var(--azul-claro);
+            color: var(--blanco);
+        }
+        
+        .agregar-section {
+            background: var(--gris-claro);
+            padding: 20px;
+            border-radius: var(--borde-redondo);
+            margin: 20px 0;
+            border: 1px solid #E2E8F0;
+        }
+        
+        .agregar-section h3 {
+            margin-top: 0;
+            color: var(--azul-profundo);
+            font-size: 18px;
+            margin-bottom: 15px;
+        }
+        
+        .simulacion {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid var(--dorado);
+        }
+        
+        .simulacion h4 {
+            margin-top: 0;
+            color: var(--azul-profundo);
+        }
+        
+        .btn-simular {
+            background: var(--dorado);
+            color: var(--azul-profundo);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+            margin-bottom: 10px;
+        }
+        
+        .btn-simular:hover {
+            background: #e6a700;
+        }
+        
+        .badge-simulacion {
+            background: var(--dorado);
+            color: var(--azul-profundo);
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+        }
+        
+        .card {
+            cursor: pointer;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-3px);
+            box-shadow: var(--sombra-hover);
+        }
+        
+        .bateria {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 8px 12px;
+            border-radius: 20px;
+            font-weight: 600;
+            margin: 10px 0;
+        }
+        
+        .bateria-alta {
+            background: #C6F6D5;
+            color: #22543D;
+        }
+        
+        .bateria-media {
+            background: #FEEBC8;
+            color: #7B341E;
+        }
+        
+        .bateria-baja {
+            background: #FED7D7;
+            color: #822727;
+            animation: parpadeo 1s infinite;
+        }
+        
+        @keyframes parpadeo {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+        
+        .badge-carga {
+            background: var(--azul-claro);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-size: 11px;
+        }
+        
+        .info-adicional {
+            margin-top: 10px;
+            padding-top: 10px;
+            border-top: 1px solid #EDF2F7;
+            display: flex;
+            justify-content: space-between;
+            color: var(--gris-texto);
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header-panel">
+            <h1>
+                📱 Kizuna
+                <span>Panel</span>
+            </h1>
+            <button class="btn-cerrar" onclick="cerrarSesion()">
+                🔒 Cerrar sesión
+            </button>
+        </div>
+
+        <!-- INDICADOR DE BATERÍA (se muestra cuando hay datos) -->
+        <div id="indicadorBateria" class="bateria" style="display: none;">
+            <span>🔋 Batería: <span id="nivelBateria">--</span>%</span>
+            <span id="estadoCarga" class="badge-carga"></span>
+        </div>
+
+        <!-- ALERTA DE BATERÍA (oculta por defecto) -->
+        <div id="alertaBateria" class="alerta alerta-peligro" style="display: none;"></div>
+
+        <!-- MODO SIMULACIÓN (para pruebas sin GPS) -->
+        <div class="simulacion">
+            <h4>🧪 Modo de pruebas <span class="badge-simulacion">Sin GPS</span></h4>
+            <p style="margin-bottom: 10px;">Mientras llega el GPS físico, puedes simular funciones para probar el sistema.</p>
+            <button class="btn-simular" onclick="simularUbicacionPrueba()">
+                📍 Simular nueva ubicación
+            </button>
+            <button class="btn-simular" onclick="simularBateriaBaja()">
+                🔋 Simular batería baja
+            </button>
+            <button class="btn-simular" onclick="simularCarga()">
+                ⚡ Simular conexión de carga
+            </button>
+            <p style="font-size: 12px; margin-top: 10px; color: #666;">
+                * Estos botones solo funcionan en modo prueba. Los datos se guardan en Firebase para que veas cómo se verá el sistema real.
+            </p>
+        </div>
+
+        <!-- SECCIÓN PARA AGREGAR NUEVAS PULSERAS -->
+        <div class="agregar-section">
+            <h3>➕ Agregar nueva pulsera</h3>
+            <div class="input-group" style="margin-bottom: 10px;">
+                <input type="text" id="nuevoCodigo" placeholder="Ej: P001" 
+                       style="margin-bottom: 10px;">
+                <button class="btn btn-primario" onclick="agregarPulsera()">
+                    ➕ Agregar pulsera
+                </button>
+            </div>
+            <p style="font-size: 12px; color: var(--gris-texto); margin: 5px 0 0;">
+                * El código debe existir en la lista de códigos autorizados
+            </p>
+        </div>
+
+        <!-- LISTA DE PULSERAS DEL PADRE -->
+        <h2>📋 Mis pulseras</h2>
+        <div id="listaPulseras" class="lista-pulseras">
+            <!-- Aquí se cargarán las pulseras dinámicamente -->
+            <div class="card">
+                <p style="text-align: center; color: var(--gris-texto); padding: 20px;">
+                    Cargando pulseras...
+                </p>
+            </div>
+        </div>
+
+        <!-- MAPA (se muestra al seleccionar una pulsera) -->
+        <div id="mapaContainer" class="mapa-container" style="display: none;">
+            <h3>📍 Ubicación actual</h3>
+            <div id="mapa"></div>
+        </div>
+
+        <!-- MENSAJES DE ALERTA -->
+        <div id="mensaje" class="alerta" style="display: none;"></div>
+        
+        <hr>
+        
+        <div class="footer">
+            <p>
+                <a href="index.html">← Volver a la página principal</a>
+            </p>
+            <p style="font-size: 12px; margin-top: 10px;">
+                Kizuna - Seguridad infantil
+            </p>
+        </div>
+    </div>
+
+    <script type="module" src="app.js"></script>
+</body>
+</html>

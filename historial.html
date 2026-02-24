@@ -5,6 +5,40 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kizuna - Historial</title>
     <link rel="stylesheet" href="style.css">
+    <style>
+        .simulacion {
+            background: #f0f0f0;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            border-left: 4px solid var(--azul-claro);
+        }
+        .simulacion h4 {
+            margin-top: 0;
+            color: var(--azul-profundo);
+        }
+        .btn-simular {
+            background: var(--dorado);
+            color: var(--azul-profundo);
+            border: none;
+            padding: 8px 16px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-weight: 600;
+            margin-right: 10px;
+        }
+        .btn-simular:hover {
+            background: #e6a700;
+        }
+        .badge-simulacion {
+            background: var(--dorado);
+            color: var(--azul-profundo);
+            font-size: 12px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            margin-left: 10px;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
@@ -13,13 +47,28 @@
             <span>Historial</span>
         </h1>
         
-        <div style="display: flex; gap: 10px; margin-bottom: 20px;">
+        <div style="display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap;">
             <button class="btn btn-secundario" onclick="window.location.href='panel.html'" style="width: auto;">
-                ← Volver
+                ← Volver al panel
             </button>
             <button class="btn btn-secundario" onclick="cerrarSesion()" style="width: auto;">
                 Cerrar sesión
             </button>
+        </div>
+
+        <!-- MODO SIMULACIÓN (solo visible para pruebas) -->
+        <div class="simulacion">
+            <h4>🧪 Modo de pruebas <span class="badge-simulacion">Sin GPS</span></h4>
+            <p style="margin-bottom: 10px;">Mientras llega el GPS físico, puedes simular ubicaciones para probar el historial.</p>
+            <button class="btn-simular" onclick="simularUbicacionPrueba()">
+                📍 Simular nueva ubicación
+            </button>
+            <button class="btn-simular" onclick="simularBateriaBaja()">
+                🔋 Simular batería baja
+            </button>
+            <p style="font-size: 12px; margin-top: 10px; color: #666;">
+                * Estos botones solo funcionan en modo prueba. Los datos se guardan en Firebase para que veas cómo se verá el historial real.
+            </p>
         </div>
 
         <!-- FILTROS -->
@@ -31,15 +80,28 @@
 
         <!-- LISTA DE HISTORIAL -->
         <div id="historial" class="lista-historial">
-            <p style="text-align: center; color: var(--gris-texto);">Selecciona una fecha para ver el historial</p>
+            <p style="text-align: center; color: var(--gris-texto);">Selecciona una fecha o usa "Últimas 10" para ver ubicaciones recientes</p>
         </div>
 
         <!-- MAPA -->
         <div id="mapaContainer" class="mapa-container" style="display: none;">
+            <h3>📍 Ubicación seleccionada</h3>
             <div id="mapa"></div>
         </div>
 
+        <!-- MENSAJES DE ALERTA -->
         <div id="mensaje" class="alerta" style="display: none;"></div>
+        
+        <hr>
+        
+        <div class="footer">
+            <p>
+                <a href="panel.html">← Volver al panel</a>
+            </p>
+            <p style="font-size: 12px; margin-top: 10px;">
+                Kizuna - Seguridad infantil
+            </p>
+        </div>
     </div>
 
     <script type="module" src="app.js"></script>

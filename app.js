@@ -1,5 +1,5 @@
 import { initializeApp } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-app.js";
-import { getDatabase, ref, set, get } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
+import { getDatabase, ref, set, get, onValue } from "https://www.gstatic.com/firebasejs/12.9.0/firebase-database.js";
 import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, onAuthStateChanged } 
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
@@ -215,6 +215,11 @@ async function cargarPulseras(uid) {
             const data = snapshot.val();
             const pulseras = data.pulseras || [];
             mostrarPulseras(pulseras);
+            
+            // Si hay pulseras, monitorear la primera (para batería)
+            if (pulseras.length > 0) {
+                monitorearBateria(pulseras[0]);
+            }
         } else {
             console.log("❌ No existe en DB. Creando ahora...");
             await set(ref(database, 'padres/' + uid), {
@@ -322,6 +327,173 @@ window.verDetalle = function(codigo) {
     window.location.href = 'historial.html';
 };
 
+// Monitorear batería en tiempo real
+function monitorearBateria(codigo) {
+    const bateriaRef = ref(database, `menores/${codigo}/bateria`);
+    
+    onValue(bateriaRef, (snapshot) => {
+        const data = snapshot.val();
+        if (data) {
+            const indicador = document.getElementById("indicadorBateria");
+            const nivelSpan = document.getElementById("nivelBateria");
+            const cargaSpan = document.getElementById("estadoCarga");
+            const alertaDiv = document.getElementById("alertaBateria");
+            
+            if (indicador) {
+                indicador.style.display = "flex";
+                nivelSpan.textContent = data.nivel;
+                
+                if (data.estado === "cargando") {
+                    cargaSpan.innerHTML = "⚡ Cargando...";
+                    indicador.className = "bateria bateria-media";
+                } else if (data.nivel <= 15) {
+                    cargaSpan.innerHTML = "⚠️ Batería baja";
+                    indicador.className = "bateria bateria-baja";
+                    
+                    if (alertaDiv) {
+                        alertaDiv.style.display = "block";
+                        alertaDiv.innerHTML = `⚠️ La pulsera ${codigo} tiene batería baja (${data.nivel}%). Conecta el cargador magnético.`;
+                    }
+                } else {
+                    cargaSpan.innerHTML = "✅ Normal";
+                    indicador.className = "bateria bateria-alta";
+                    
+                    if (alertaDiv) {
+                        alertaDiv.style.display = "none";
+                    }
+                }
+            }
+        }
+    });
+}
+
+// ============================================
+// FUNCIONES DE SIMULACIÓN (para pruebas sin GPS)
+// ============================================
+
+function obtenerCodigoActual() {
+    return sessionStorage.getItem('pulseraActual');
+}
+
+// Simular ubicación de prueba
+window.simularUbicacionPrueba = async function() {
+    const codigo = obtenerCodigoActual();
+    
+    if (!codigo) {
+        alert("❌ No hay pulsera seleccionada");
+        return;
+    }
+    
+    const lat = 19.4326 + (Math.random() - 0.5) * 0.01;
+    const lng = -99.1332 + (Math.random() - 0.5) * 0.01;
+    const fecha = new Date();
+    const fechaStr = fecha.toISOString().split('T')[0];
+    const horaStr = fecha.toTimeString().split(' ')[0];
+    
+    const lugares = ["Casa", "Escuela", "Parque", "Supermercado", "Casa de abuela", "Centro comercial"];
+    const lugar = lugares[Math.floor(Math.random() * lugares.length)];
+    
+    try {
+        const ubicacionRef = ref(database, `menores/${codigo}/historial/${fechaStr}/${horaStr}`);
+        await set(ubicacionRef, {
+            lat: lat,
+            lng: lng,
+            lugar: lugar,
+            bateria: Math.floor(Math.random() * 30) + 70
+        });
+        
+        alert(`✅ Ubicación simulada guardada: ${lugar}`);
+        
+        if (document.getElementById("historial")) {
+            cargarHistorialReciente();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Error al simular ubicación: " + error.message);
+    }
+};
+
+// Simular batería baja
+window.simularBateriaBaja = async function() {
+    const codigo = obtenerCodigoActual();
+    
+    if (!codigo) {
+        alert("❌ No hay pulsera seleccionada");
+        return;
+    }
+    
+    try {
+        const bateriaRef = ref(database, `menores/${codigo}/bateria`);
+        await set(bateriaRef, {
+            nivel: 15,
+            estado: "baja",
+            ultima_actualizacion: new Date().toString()
+        });
+        
+        alert("⚠️ Simulación de batería baja activada (15%)");
+        
+        if (Notification.permission === "granted") {
+            new Notification("🔋 Kizuna - Batería baja", {
+                body: `La pulsera ${codigo} tiene 15% de batería. Conecta el cargador magnético.`,
+                icon: "/icono-bateria.png"
+            });
+        } else if (Notification.permission !== "denied") {
+            Notification.requestPermission();
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Error al simular batería baja: " + error.message);
+    }
+};
+
+// Simular conexión de carga
+window.simularCarga = async function() {
+    const codigo = obtenerCodigoActual();
+    
+    if (!codigo) {
+        alert("❌ No hay pulsera seleccionada");
+        return;
+    }
+    
+    try {
+        const bateriaRef = ref(database, `menores/${codigo}/bateria`);
+        await set(bateriaRef, {
+            nivel: 85,
+            estado: "cargando",
+            ultima_actualizacion: new Date().toString()
+        });
+        
+        alert("⚡ Pulsera conectada a carga magnética. Batería al 85%");
+        
+        // Simular carga completa después de 3 segundos
+        setTimeout(async () => {
+            await set(bateriaRef, {
+                nivel: 100,
+                estado: "completa",
+                ultima_actualizacion: new Date().toString()
+            });
+            
+            if (Notification.permission === "granted") {
+                new Notification("✅ Kizuna - Carga completa", {
+                    body: `La pulsera ${codigo} ya está completamente cargada.`,
+                    icon: "/icono-bateria.png"
+                });
+            }
+        }, 3000);
+        
+    } catch (error) {
+        console.error("Error:", error);
+        alert("❌ Error al simular carga: " + error.message);
+    }
+};
+
+// Solicitar permiso para notificaciones
+if (window.location.pathname.includes("panel.html") || window.location.pathname.includes("historial.html")) {
+    if (Notification && Notification.permission === "default") {
+        Notification.requestPermission();
+    }
+}
+
 // ============================================
 // FUNCIONES PARA CONSULTA (consulta.html)
 // ============================================
@@ -360,5 +532,170 @@ async function cargarDatosConsulta(id) {
     } catch (error) {
         console.error("Error:", error);
         infoDiv.innerHTML = `<div class="alerta alerta-peligro">Error al cargar datos</div>`;
+    }
+}
+
+// ============================================
+// FUNCIONES PARA HISTORIAL (historial.html)
+// ============================================
+
+// Cargar historial reciente
+window.cargarHistorialReciente = async function() {
+    const codigo = obtenerCodigoActual();
+    const contenedor = document.getElementById("historial");
+    const mapaContainer = document.getElementById("mapaContainer");
+    
+    if (!codigo) {
+        contenedor.innerHTML = "<p class='alerta alerta-peligro'>No hay pulsera seleccionada</p>";
+        return;
+    }
+    
+    contenedor.innerHTML = "<p class='alerta'>Cargando historial...</p>";
+    if (mapaContainer) mapaContainer.style.display = "none";
+    
+    try {
+        const historialRef = ref(database, `menores/${codigo}/historial`);
+        const snapshot = await get(historialRef);
+        
+        if (snapshot.exists()) {
+            const datos = snapshot.val();
+            mostrarHistorialCompleto(datos);
+        } else {
+            contenedor.innerHTML = `
+                <div class="alerta alerta-info">
+                    <p>No hay historial disponible para esta pulsera.</p>
+                    <p style="font-size: 12px; margin-top: 10px;">Usa el botón "Simular nueva ubicación" para probar.</p>
+                </div>
+            `;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        contenedor.innerHTML = `<p class="alerta alerta-peligro">Error al cargar historial: ${error.message}</p>`;
+    }
+};
+
+// Cargar historial por fecha
+window.cargarHistorialPorFecha = async function() {
+    const codigo = obtenerCodigoActual();
+    const fecha = document.getElementById("fechaFiltro").value;
+    const contenedor = document.getElementById("historial");
+    const mapaContainer = document.getElementById("mapaContainer");
+    
+    if (!codigo) {
+        contenedor.innerHTML = "<p class='alerta alerta-peligro'>No hay pulsera seleccionada</p>";
+        return;
+    }
+    
+    if (!fecha) {
+        alert("❌ Selecciona una fecha");
+        return;
+    }
+    
+    contenedor.innerHTML = "<p class='alerta'>Cargando historial...</p>";
+    if (mapaContainer) mapaContainer.style.display = "none";
+    
+    try {
+        const historialRef = ref(database, `menores/${codigo}/historial/${fecha}`);
+        const snapshot = await get(historialRef);
+        
+        if (snapshot.exists()) {
+            const datos = snapshot.val();
+            mostrarHistorialPorFecha(fecha, datos);
+        } else {
+            contenedor.innerHTML = `<p class='alerta alerta-info'>No hay ubicaciones para la fecha ${fecha}</p>`;
+        }
+    } catch (error) {
+        console.error("Error:", error);
+        contenedor.innerHTML = `<p class="alerta alerta-peligro">Error al cargar historial: ${error.message}</p>`;
+    }
+};
+
+function mostrarHistorialCompleto(datos) {
+    const contenedor = document.getElementById("historial");
+    let html = '<h3>📋 Todas las ubicaciones guardadas</h3>';
+    
+    const fechas = Object.keys(datos).sort().reverse();
+    
+    fechas.forEach(fecha => {
+        html += `<h4 style="margin-top: 20px; color: var(--azul-medio);">📅 ${fecha}</h4>`;
+        
+        const horas = Object.keys(datos[fecha]).sort().reverse();
+        
+        horas.slice(0, 5).forEach(hora => {
+            const entrada = datos[fecha][hora];
+            html += `
+                <div class="item-historial" onclick="verEnMapa('${entrada.lat}', '${entrada.lng}')">
+                    <div class="fecha">🕒 ${hora}</div>
+                    <div>📍 ${entrada.lugar || 'Ubicación desconocida'}</div>
+                    <div class="coordenadas">${entrada.lat}, ${entrada.lng}</div>
+                    ${entrada.bateria ? `<div>🔋 Batería: ${entrada.bateria}%</div>` : ''}
+                </div>
+            `;
+        });
+        
+        if (Object.keys(datos[fecha]).length > 5) {
+            html += `<p style="text-align: right; font-size: 12px;">... y ${Object.keys(datos[fecha]).length - 5} más</p>`;
+        }
+    });
+    
+    contenedor.innerHTML = html;
+}
+
+function mostrarHistorialPorFecha(fecha, datos) {
+    const contenedor = document.getElementById("historial");
+    let html = `<h3>📍 Ubicaciones del ${fecha}</h3>`;
+    
+    const horas = Object.keys(datos).sort().reverse();
+    
+    horas.forEach(hora => {
+        const entrada = datos[hora];
+        html += `
+            <div class="item-historial" onclick="verEnMapa('${entrada.lat}', '${entrada.lng}')">
+                <div class="fecha">🕒 ${hora}</div>
+                <div>📍 ${entrada.lugar || 'Ubicación desconocida'}</div>
+                <div class="coordenadas">${entrada.lat}, ${entrada.lng}</div>
+                ${entrada.bateria ? `<div>🔋 Batería: ${entrada.bateria}%</div>` : ''}
+            </div>
+        `;
+    });
+    
+    contenedor.innerHTML = html;
+}
+
+window.verEnMapa = function(lat, lng) {
+    const mapaContainer = document.getElementById("mapaContainer");
+    const mapaDiv = document.getElementById("mapa");
+    
+    if (mapaContainer) {
+        mapaContainer.style.display = "block";
+        mapaDiv.innerHTML = `
+            <iframe 
+                width="100%" 
+                height="300" 
+                frameborder="0" 
+                src="https://www.openstreetmap.org/export/embed.html?bbox=${lng-0.01},${lat-0.01},${lng+0.01},${lat+0.01}&layer=mapnik&marker=${lat},${lng}">
+            </iframe>
+        `;
+        
+        mapaContainer.scrollIntoView({ behavior: 'smooth' });
+    }
+};
+
+// Verificar pulsera seleccionada en historial
+if (window.location.pathname.includes("historial.html")) {
+    const codigo = obtenerCodigoActual();
+    if (!codigo) {
+        const contenedor = document.getElementById("historial");
+        if (contenedor) {
+            contenedor.innerHTML = `
+                <div class="alerta alerta-peligro">
+                    <p>No hay pulsera seleccionada.</p>
+                    <p>Por favor, selecciona una pulsera desde el panel.</p>
+                    <button class="btn btn-primario" onclick="window.location.href='panel.html'" style="margin-top: 10px;">
+                        Ir al panel
+                    </button>
+                </div>
+            `;
+        }
     }
 }
