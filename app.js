@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBGfmmdSDsYrpgYz5nt2ebvfbHiXRTKXzU",  
+  apiKey: "AIzaSyBGfmmdSDsYrpgYz5nt2ebvfBhIXRTKXzu",
   authDomain: "pulsera-b82ce.firebaseapp.com",
   projectId: "pulsera-b82ce",
   storageBucket: "pulsera-b82ce.firebasestorage.app",
@@ -18,7 +18,6 @@ const auth = getAuth(app);
 
 console.log("🔥 Realtime Database conectada");
 console.log("🔐 Auth inicializado");
-
 // ============================================
 // FUNCIONES PARA PÁGINA PRINCIPAL (index.html)
 // ============================================
@@ -295,4 +294,5 @@ window.cerrarSesion = function() {
     }).catch((error) => {
         console.error("Error:", error);
     });
+
 };
