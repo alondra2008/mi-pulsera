@@ -3,47 +3,129 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Kizuna - Pulsera Infantil</title>
-   <link rel="stylesheet" href="style.css">
+    <title>Kizuna - Registro</title>
+    <link rel="stylesheet" href="style.css">
+    <style>
+        .contacto-card {
+            background: var(--gris-claro);
+            padding: 15px;
+            border-radius: 10px;
+            margin: 15px 0;
+            border-left: 4px solid var(--azul-claro);
+        }
+        .contacto-card h4 {
+            margin-top: 0;
+            color: var(--azul-profundo);
+        }
+        .obligatorio {
+            color: #e53e3e;
+            font-size: 12px;
+            margin-left: 5px;
+        }
+        .small-note {
+            font-size: 12px;
+            color: var(--gris-texto);
+            margin: 5px 0;
+        }
+    </style>
 </head>
 <body>
     <div class="container">
         <h1>
-            👶 Kizuna
-            <span>Seguridad</span>
+            📝 Kizuna
+            <span>Registro</span>
         </h1>
         
-        <!-- PASO 1: Ingresar código -->
+        <!-- PASO 1: Ingresar código (se mantiene igual) -->
         <div id="paso1">
-            <h2>Paso 1: Ingresa el código de tu pulsera</h2>
-            <p style="color: var(--gris-texto); margin-bottom: 20px;">El código está escrito debajo del QR (ej: P001, P002...)</p>
-            
+            <h2>Paso 1: Ingresa el código de la pulsera</h2>
+            <p><small>El código está escrito debajo del QR (ej: P001, P002...)</small></p>
             <div class="input-group">
                 <input type="text" id="codigoPulsera" placeholder="Ej: P001" required>
             </div>
-            
-            <button class="btn btn-primario" onclick="buscarPulsera()">
-                🔍 Continuar
-            </button>
+            <button class="btn btn-primario" onclick="buscarPulsera()">🔍 Continuar</button>
         </div>
 
-        <!-- PASO 2: Formulario de registro -->
+        <!-- PASO 2: Formulario de registro (mejorado) -->
         <div id="paso2" class="oculto">
-            <h2>📝 Registrar niño para pulsera <span id="codigoMostrar"></span></h2>
+            <h2>📋 Registrar persona para pulsera <span id="codigoMostrar"></span></h2>
             
             <div class="input-group">
-                <input type="text" id="nombre" placeholder="Nombre del menor" required>
+                <label>Nombre (opcional)</label>
+                <input type="text" id="nombre" placeholder="Ej: Héctor o iniciales">
             </div>
             
             <div class="input-group">
-                <input type="text" id="alergia" placeholder="Alergias (opcional)">
+                <label>Edad (opcional)</label>
+                <input type="number" id="edad" placeholder="Ej: 78">
             </div>
             
             <div class="input-group">
-                <input type="text" id="contacto" placeholder="Teléfono de emergencia" required>
+                <label>Condición / Situación (opcional)</label>
+                <input type="text" id="condicion" placeholder="Ej: Alzheimer, deportista, viajero...">
             </div>
             
-            <button class="btn btn-primario" onclick="registrar()">✅ Registrar</button>
+            <div class="input-group">
+                <label>Alergias <span class="obligatorio">*</span></label>
+                <input type="text" id="alergias" placeholder="Ej: Polvo, penicilina, mariscos" required>
+            </div>
+            
+            <div class="input-group">
+                <label>Tipo de sangre (opcional)</label>
+                <input type="text" id="tipoSangre" placeholder="Ej: O+">
+            </div>
+            
+            <h3>📞 Contactos de emergencia <span class="obligatorio">(3 obligatorios)</span></h3>
+            <p class="small-note">Los tres contactos son necesarios para registrar la pulsera</p>
+            
+            <!-- Contacto 1 -->
+            <div class="contacto-card">
+                <h4>Contacto 1</h4>
+                <div class="input-group">
+                    <input type="text" id="contacto1_nombre" placeholder="Nombre (opcional)">
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="contacto1_tel" placeholder="Teléfono *" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="contacto1_rel" placeholder="Relación * (ej: hija, esposo)" required>
+                </div>
+            </div>
+            
+            <!-- Contacto 2 -->
+            <div class="contacto-card">
+                <h4>Contacto 2</h4>
+                <div class="input-group">
+                    <input type="text" id="contacto2_nombre" placeholder="Nombre (opcional)">
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="contacto2_tel" placeholder="Teléfono *" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="contacto2_rel" placeholder="Relación *" required>
+                </div>
+            </div>
+            
+            <!-- Contacto 3 -->
+            <div class="contacto-card">
+                <h4>Contacto 3</h4>
+                <div class="input-group">
+                    <input type="text" id="contacto3_nombre" placeholder="Nombre (opcional)">
+                </div>
+                <div class="input-group">
+                    <input type="tel" id="contacto3_tel" placeholder="Teléfono *" required>
+                </div>
+                <div class="input-group">
+                    <input type="text" id="contacto3_rel" placeholder="Relación *" required>
+                </div>
+            </div>
+            
+            <div class="input-group">
+                <label>Notas adicionales (opcional)</label>
+                <textarea id="notas" rows="3" placeholder="Información relevante para emergencias..."></textarea>
+            </div>
+            
+            <button class="btn btn-primario" onclick="registrar()">✅ Registrar persona</button>
             <button class="btn btn-secundario" onclick="volver()">← Volver</button>
         </div>
 
@@ -53,7 +135,7 @@
         <hr>
         
         <div class="footer">
-            <p>¿Eres padre? <a href="login.html">Accede a tu panel aquí</a></p>
+            <p>¿Eres responsable? <a href="login.html">Accede a tu panel aquí</a></p>
         </div>
     </div>
 
