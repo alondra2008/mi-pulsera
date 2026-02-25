@@ -45,7 +45,7 @@ window.buscarPulsera = async function() {
             return;
         }
         
-        const menorRef = ref(database, 'menores/' + codigo);
+        const menorRef = ref(database, 'protegidos/' + codigo);
         const menorSnapshot = await get(menorRef);
         
         if (menorSnapshot.exists()) {
@@ -115,7 +115,7 @@ window.registrar = async function() {
     ];
     
     try {
-        await set(ref(database, 'menores/' + codigo), {
+        await set(ref(database, 'protegidos/' + codigo), {
             nombre: nombre,
             edad: edad,
             condicion: condicion,
@@ -159,7 +159,7 @@ async function cargarDatosConsulta(id) {
     const infoDiv = document.getElementById("info");
     
     try {
-        const menorRef = ref(database, 'menores/' + id);
+        const menorRef = ref(database, 'protegidos/' + id);
         const snapshot = await get(menorRef);
         
         if (snapshot.exists()) {
@@ -296,4 +296,5 @@ window.cerrarSesion = function() {
     });
 
 };
+
 
