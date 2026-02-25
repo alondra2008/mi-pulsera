@@ -4,7 +4,7 @@ import { getAuth, createUserWithEmailAndPassword, signInWithEmailAndPassword, si
 from "https://www.gstatic.com/firebasejs/12.9.0/firebase-auth.js";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyCUUyNjYPxRNIVawhnUrhNN30wsLiGMbyY",
+  apiKey: "AIzaSyBGfmmdSDsYrpgYz5nt2ebvfbHiXRTKXzU",
   authDomain: "pulsera-b82ce.firebaseapp.com",
   projectId: "pulsera-b82ce",
   storageBucket: "pulsera-b82ce.firebasestorage.app",
@@ -18,6 +18,7 @@ const auth = getAuth(app);
 
 console.log("🔥 Realtime Database conectada");
 console.log("🔐 Auth inicializado");
+
 // ============================================
 // FUNCIONES PARA PÁGINA PRINCIPAL (index.html)
 // ============================================
@@ -45,10 +46,10 @@ window.buscarPulsera = async function() {
             return;
         }
         
-        const menorRef = ref(database, 'protegidos/' + codigo);
-        const menorSnapshot = await get(menorRef);
+        const protegidoRef = ref(database, 'protegidos/' + codigo);
+        const protegidoSnapshot = await get(protegidoRef);
         
-        if (menorSnapshot.exists()) {
+        if (protegidoSnapshot.exists()) {
             window.location.href = `consulta.html?id=${codigo}`;
             return;
         }
@@ -68,61 +69,49 @@ window.buscarPulsera = async function() {
 window.registrar = async function() {
     const codigo = document.getElementById("codigoMostrar").textContent;
     
-    // Datos generales (opcionales)
     const nombre = document.getElementById("nombre").value.trim() || "Anónimo";
-    const edad = document.getElementById("edad").value.trim() || "";
-    const condicion = document.getElementById("condicion").value.trim() || "";
     const alergias = document.getElementById("alergias").value.trim();
-    const tipoSangre = document.getElementById("tipoSangre").value.trim() || "";
-    const notas = document.getElementById("notas").value.trim() || "";
     
-    // Contactos (obligatorios)
-    const contacto1_tel = document.getElementById("contacto1_tel").value.trim();
-    const contacto1_rel = document.getElementById("contacto1_rel").value.trim();
-    const contacto2_tel = document.getElementById("contacto2_tel").value.trim();
-    const contacto2_rel = document.getElementById("contacto2_rel").value.trim();
-    const contacto3_tel = document.getElementById("contacto3_tel").value.trim();
-    const contacto3_rel = document.getElementById("contacto3_rel").value.trim();
+    // Contactos obligatorios (1,2,3)
+    const tel1 = document.getElementById("contacto1_tel").value.trim();
+    const rel1 = document.getElementById("contacto1_rel").value.trim();
+    const tel2 = document.getElementById("contacto2_tel").value.trim();
+    const rel2 = document.getElementById("contacto2_rel").value.trim();
+    const tel3 = document.getElementById("contacto3_tel").value.trim();
+    const rel3 = document.getElementById("contacto3_rel").value.trim();
     
-    // Validar alergias y teléfonos
+    // Contacto opcional (4)
+    const tel4 = document.getElementById("contacto4_tel").value.trim();
+    const rel4 = document.getElementById("contacto4_rel").value.trim();
+    
+    // Validaciones
     if (!alergias) {
         alert("❌ Las alergias son obligatorias");
         return;
     }
     
-    if (!contacto1_tel || !contacto1_rel || !contacto2_tel || !contacto2_rel || !contacto3_tel || !contacto3_rel) {
-        alert("❌ Los 3 contactos de emergencia con teléfono y relación son obligatorios");
+    if (!tel1 || !rel1 || !tel2 || !rel2 || !tel3 || !rel3) {
+        alert("❌ Los 3 primeros contactos con teléfono y relación son obligatorios");
         return;
     }
     
-    // Construir objeto de contactos
+    // Construir array de contactos
     const contactos = [
-        {
-            nombre: document.getElementById("contacto1_nombre").value.trim() || "",
-            telefono: contacto1_tel,
-            relacion: contacto1_rel
-        },
-        {
-            nombre: document.getElementById("contacto2_nombre").value.trim() || "",
-            telefono: contacto2_tel,
-            relacion: contacto2_rel
-        },
-        {
-            nombre: document.getElementById("contacto3_nombre").value.trim() || "",
-            telefono: contacto3_tel,
-            relacion: contacto3_rel
-        }
+        { telefono: tel1, relacion: rel1 },
+        { telefono: tel2, relacion: rel2 },
+        { telefono: tel3, relacion: rel3 }
     ];
+    
+    // Agregar contacto 4 solo si tiene teléfono
+    if (tel4 && rel4) {
+        contactos.push({ telefono: tel4, relacion: rel4 });
+    }
     
     try {
         await set(ref(database, 'protegidos/' + codigo), {
             nombre: nombre,
-            edad: edad,
-            condicion: condicion,
             alergias: alergias,
-            tipoSangre: tipoSangre,
             contactos: contactos,
-            notas: notas,
             fecha: new Date().toString()
         });
         
@@ -159,65 +148,49 @@ async function cargarDatosConsulta(id) {
     const infoDiv = document.getElementById("info");
     
     try {
-        const menorRef = ref(database, 'protegidos/' + id);
-        const snapshot = await get(menorRef);
+        const protegidoRef = ref(database, 'protegidos/' + id);
+        const snapshot = await get(protegidoRef);
         
         if (snapshot.exists()) {
             const datos = snapshot.val();
             
-            // Construir HTML de contactos
-            let contactosHTML = '';
-            if (datos.contactos && Array.isArray(datos.contactos)) {
+            let contactosHTML = '<div style="margin:15px 0;">';
+            if (datos.contactos && datos.contactos.length > 0) {
                 datos.contactos.forEach((contacto, index) => {
-                    const nombreContacto = contacto.nombre || `Contacto ${index+1}`;
                     contactosHTML += `
-                        <div class="contacto-item">
-                            <strong>${nombreContacto}</strong> (${contacto.relacion || '?'})<br>
-                            📞 ${contacto.telefono}
-                            <button class="btn-llamar" onclick="window.location.href='tel:${contacto.telefono}'">
-                                Llamar
+                        <div style="background:#f5f5f5; padding:12px; margin:10px 0; border-radius:8px; border-left:4px solid #4A8FE4;">
+                            <strong>Contacto ${index + 1}</strong><br>
+                            📞 ${contacto.telefono} (${contacto.relacion})<br>
+                            <button onclick="window.location.href='tel:${contacto.telefono}'" 
+                                    style="background:#4A8FE4; color:white; border:none; padding:6px 18px; border-radius:5px; margin-top:8px; cursor:pointer; font-size:14px;">
+                                📱 Llamar ahora
                             </button>
                         </div>
                     `;
                 });
             }
-            
-            // Información médica
-            let infoMedica = '';
-            if (datos.tipoSangre) infoMedica += `• Tipo de sangre: ${datos.tipoSangre}<br>`;
-            if (datos.edad) infoMedica += `• Edad: ${datos.edad}<br>`;
-            if (datos.condicion) infoMedica += `• ${datos.condicion}<br>`;
+            contactosHTML += '</div>';
             
             infoDiv.innerHTML = `
-                <h2>👤 ${datos.nombre}</h2>
-                
-                <div class="card">
-                    ${infoMedica ? `<p>${infoMedica}</p>` : ''}
+                <h2 style="color:#0A2647;">👤 ${datos.nombre}</h2>
+                <div style="background:#f0f4f8; padding:15px; border-radius:10px; margin:15px 0;">
                     <p><strong>⚠️ Alergias:</strong> ${datos.alergias}</p>
                 </div>
-                
                 <h3>📞 Contactos de emergencia</h3>
-                ${contactosHTML || '<p>No hay contactos registrados</p>'}
-                
-                ${datos.notas ? `
-                    <div class="card">
-                        <p><strong>💬 Notas:</strong> ${datos.notas}</p>
-                    </div>
-                ` : ''}
+                ${contactosHTML}
             `;
         } else {
-            infoDiv.innerHTML = `<div class="alerta alerta-peligro">No se encontró información</div>`;
+            infoDiv.innerHTML = `<div style="background:#FED7D7; padding:15px; border-radius:8px; color:#822727;">No se encontró información para esta pulsera</div>`;
         }
     } catch (error) {
         console.error("Error:", error);
-        infoDiv.innerHTML = `<div class="alerta alerta-peligro">Error al cargar datos: ${error.message}</div>`;
+        infoDiv.innerHTML = `<div style="background:#FED7D7; padding:15px; border-radius:8px; color:#822727;">Error al cargar datos</div>`;
     }
 }
 
 // ============================================
-// FUNCIONES PARA LOGIN (login.html) - IGUAL
+// FUNCIONES PARA LOGIN (login.html)
 // ============================================
-// (Se mantienen igual que en tu código anterior)
 
 window.mostrarRegistro = function() {
     document.getElementById("loginForm").style.display = "none";
@@ -260,6 +233,7 @@ window.registrarse = async function() {
         }, 1500);
         
     } catch (error) {
+        console.error("Error:", error);
         mensaje.innerHTML = "❌ Error: " + error.message;
         mensaje.className = "alerta alerta-peligro";
         mensaje.style.display = "block";
@@ -282,6 +256,7 @@ window.iniciarSesion = async function() {
         await signInWithEmailAndPassword(auth, email, password);
         window.location.href = "panel.html";
     } catch (error) {
+        console.error("Error:", error);
         mensaje.innerHTML = "❌ Error: " + error.message;
         mensaje.className = "alerta alerta-peligro";
         mensaje.style.display = "block";
@@ -294,7 +269,4 @@ window.cerrarSesion = function() {
     }).catch((error) => {
         console.error("Error:", error);
     });
-
 };
-
-

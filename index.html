@@ -36,7 +36,7 @@
             <span>Registro</span>
         </h1>
         
-        <!-- PASO 1: Ingresar código (se mantiene igual) -->
+        <!-- PASO 1: Ingresar código -->
         <div id="paso1">
             <h2>Paso 1: Ingresa el código de la pulsera</h2>
             <p><small>El código está escrito debajo del QR (ej: P001, P002...)</small></p>
@@ -46,7 +46,7 @@
             <button class="btn btn-primario" onclick="buscarPulsera()">🔍 Continuar</button>
         </div>
 
-        <!-- PASO 2: Formulario de registro (mejorado) -->
+        <!-- PASO 2: Formulario de registro -->
         <div id="paso2" class="oculto">
             <h2>📋 Registrar persona para pulsera <span id="codigoMostrar"></span></h2>
             
@@ -56,34 +56,15 @@
             </div>
             
             <div class="input-group">
-                <label>Edad (opcional)</label>
-                <input type="number" id="edad" placeholder="Ej: 78">
-            </div>
-            
-            <div class="input-group">
-                <label>Condición / Situación (opcional)</label>
-                <input type="text" id="condicion" placeholder="Ej: Alzheimer, deportista, viajero...">
-            </div>
-            
-            <div class="input-group">
                 <label>Alergias <span class="obligatorio">*</span></label>
                 <input type="text" id="alergias" placeholder="Ej: Polvo, penicilina, mariscos" required>
             </div>
             
-            <div class="input-group">
-                <label>Tipo de sangre (opcional)</label>
-                <input type="text" id="tipoSangre" placeholder="Ej: O+">
-            </div>
+            <h3>📞 Contactos de emergencia <span class="obligatorio">(3 obligatorios + 1 opcional)</span></h3>
             
-            <h3>📞 Contactos de emergencia <span class="obligatorio">(3 obligatorios)</span></h3>
-            <p class="small-note">Los tres contactos son necesarios para registrar la pulsera</p>
-            
-            <!-- Contacto 1 -->
+            <!-- Contacto 1 (obligatorio) -->
             <div class="contacto-card">
-                <h4>Contacto 1</h4>
-                <div class="input-group">
-                    <input type="text" id="contacto1_nombre" placeholder="Nombre (opcional)">
-                </div>
+                <h4>Contacto 1 <span class="obligatorio">*</span></h4>
                 <div class="input-group">
                     <input type="tel" id="contacto1_tel" placeholder="Teléfono *" required>
                 </div>
@@ -92,12 +73,9 @@
                 </div>
             </div>
             
-            <!-- Contacto 2 -->
+            <!-- Contacto 2 (obligatorio) -->
             <div class="contacto-card">
-                <h4>Contacto 2</h4>
-                <div class="input-group">
-                    <input type="text" id="contacto2_nombre" placeholder="Nombre (opcional)">
-                </div>
+                <h4>Contacto 2 <span class="obligatorio">*</span></h4>
                 <div class="input-group">
                     <input type="tel" id="contacto2_tel" placeholder="Teléfono *" required>
                 </div>
@@ -106,12 +84,9 @@
                 </div>
             </div>
             
-            <!-- Contacto 3 -->
+            <!-- Contacto 3 (obligatorio) -->
             <div class="contacto-card">
-                <h4>Contacto 3</h4>
-                <div class="input-group">
-                    <input type="text" id="contacto3_nombre" placeholder="Nombre (opcional)">
-                </div>
+                <h4>Contacto 3 <span class="obligatorio">*</span></h4>
                 <div class="input-group">
                     <input type="tel" id="contacto3_tel" placeholder="Teléfono *" required>
                 </div>
@@ -120,16 +95,21 @@
                 </div>
             </div>
             
-            <div class="input-group">
-                <label>Notas adicionales (opcional)</label>
-                <textarea id="notas" rows="3" placeholder="Información relevante para emergencias..."></textarea>
+            <!-- Contacto 4 (opcional) -->
+            <div class="contacto-card">
+                <h4>Contacto 4 (opcional)</h4>
+                <div class="input-group">
+                    <input type="tel" id="contacto4_tel" placeholder="Teléfono">
+                </div>
+                <div class="input-group">
+                    <input type="text" id="contacto4_rel" placeholder="Relación">
+                </div>
             </div>
             
             <button class="btn btn-primario" onclick="registrar()">✅ Registrar persona</button>
             <button class="btn btn-secundario" onclick="volver()">← Volver</button>
         </div>
 
-        <!-- Mensajes de alerta -->
         <div id="mensaje" class="alerta" style="display: none;"></div>
         
         <hr>
